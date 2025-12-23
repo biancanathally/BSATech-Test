@@ -448,8 +448,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9bbc6113f64934cacaa51404f1c501cf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  allyImage: {fileID: 1359145616}
-  enemyImage: {fileID: 828466021}
+  pokemonPlayerImage: {fileID: 1359145616}
+  pokemonEnemyImage: {fileID: 828466021}
   moveButtons:
   - {fileID: 2036035813}
   - {fileID: 422450450}

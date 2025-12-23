@@ -13,7 +13,7 @@ public class PokemonData
 public class Sprites
 {
     public string front_default;
-    public string back_default; // Essencial para validação do Aliado
+    public string back_default;
 }
 
 [Serializable]
@@ -32,7 +32,6 @@ public class MoveWrapper { public MoveInfo move; }
 [Serializable]
 public class MoveInfo { public string name; public string url; }
 
-// Classe extra para pegar os detalhes do movimento (PP e Tipo)
 [Serializable]
 public class MoveDetailsData
 {
