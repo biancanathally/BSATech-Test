@@ -36,11 +36,9 @@ public class BattleUIManager : MonoBehaviour
             btn.Setup(this);
         }
 
-        // Opcional: Já deixa o primeiro botão (Fight) selecionado visualmente
+        // Fight button is selected by default
         if (actionButtons.Length > 0)
-        {
             SelectAction(actionButtons[0]);
-        }
 
         StartCoroutine(StartBattleSequence());
     }
@@ -49,23 +47,16 @@ public class BattleUIManager : MonoBehaviour
     {
         foreach (var btn in actionButtons)
         {
-            // Liga a seta se for o botão selecionado, desliga se não for
             btn.SetArrowActive(btn == selectedButton);
         }
     }
 
     public void OnFightButton()
     {
-        actionsPanel.SetActive(false); // Esconde o menu inicial
-        movesPanel.SetActive(true);    // Mostra os ataques
-
-        // Opcional: Se quiser garantir que o primeiro ataque já venha selecionado visualmente
-        // quando abrir o menu, você pode re-chamar a seleção do primeiro botão aqui,
-        // mas a lógica do SetupAllyUI já deve ter cuidado disso.
+        actionsPanel.SetActive(false);
+        movesPanel.SetActive(true);
     }
 
-    // --- NOVA FUNÇÃO (Opcional) ---
-    // Para voltar (Botão de cancelar/voltar)
     public void OnBackToActions()
     {
         movesPanel.SetActive(false);
@@ -150,26 +141,17 @@ public class BattleUIManager : MonoBehaviour
 
     public void OnCloseMovesPanel()
     {
-        // 1. Troca os painéis
         movesPanel.SetActive(false);
         actionsPanel.SetActive(true);
 
-        // 2. (Opcional) Reseta a seleção visual do Menu Principal
-        // Isso garante que a seta volte para o "Fight" ou para onde estava
         if (actionButtons.Length > 0)
-        {
-            // Se quiser que volte sempre para o Fight (índice 0):
             SelectAction(actionButtons[0]); 
-        }
     }
 
-    // DICA EXTRA: Para funcionar com a tecla ESC do teclado
+    // To handle ESC key to close moves panel
     void Update()
     {
-        // Se o painel de ataques estiver aberto e apertar ESC
         if (movesPanel.activeSelf && Input.GetKeyDown(KeyCode.Escape))
-        {
             OnCloseMovesPanel();
-        }
     }
 }
