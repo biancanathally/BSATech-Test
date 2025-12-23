@@ -5,6 +5,13 @@ using TMPro;
 
 public class BattleUIManager : MonoBehaviour
 {
+    [Header("Menu Panels")]
+    public GameObject actionsPanel;
+    public GameObject movesPanel;
+
+    [Header("Action Buttons (Main Menu)")]
+    public ActionButton[] actionButtons;
+
     [Header("Pokemon Player")]
     public RawImage pokemonPlayerImage;
     // public Text pokemonPlayerNameText;
@@ -15,7 +22,7 @@ public class BattleUIManager : MonoBehaviour
     // public Text pokemonEnemyNameText;
 
     [Header("Moves UI")]
-    public MoveButton[] moveButtons; 
+    public MoveButton[] moveButtons;
     public TMP_Text moveTypeText;
     public TMP_Text movePPText;
 
@@ -24,7 +31,45 @@ public class BattleUIManager : MonoBehaviour
         // moveTypeText.text = "-";
         // movePPText.text = "-/-";
 
+        foreach (var btn in actionButtons)
+        {
+            btn.Setup(this);
+        }
+
+        // Opcional: Já deixa o primeiro botão (Fight) selecionado visualmente
+        if (actionButtons.Length > 0)
+        {
+            SelectAction(actionButtons[0]);
+        }
+
         StartCoroutine(StartBattleSequence());
+    }
+
+    public void SelectAction(ActionButton selectedButton)
+    {
+        foreach (var btn in actionButtons)
+        {
+            // Liga a seta se for o botão selecionado, desliga se não for
+            btn.SetArrowActive(btn == selectedButton);
+        }
+    }
+
+    public void OnFightButton()
+    {
+        actionsPanel.SetActive(false); // Esconde o menu inicial
+        movesPanel.SetActive(true);    // Mostra os ataques
+
+        // Opcional: Se quiser garantir que o primeiro ataque já venha selecionado visualmente
+        // quando abrir o menu, você pode re-chamar a seleção do primeiro botão aqui,
+        // mas a lógica do SetupAllyUI já deve ter cuidado disso.
+    }
+
+    // --- NOVA FUNÇÃO (Opcional) ---
+    // Para voltar (Botão de cancelar/voltar)
+    public void OnBackToActions()
+    {
+        movesPanel.SetActive(false);
+        actionsPanel.SetActive(true);
     }
 
     IEnumerator StartBattleSequence()
@@ -96,9 +141,35 @@ public class BattleUIManager : MonoBehaviour
 
     public void UpdateMoveDetails(string url)
     {
-        StartCoroutine(PokeApiManager.Instance.GetMoveDetails(url, (details) => {
+        StartCoroutine(PokeApiManager.Instance.GetMoveDetails(url, (details) =>
+        {
             moveTypeText.text = details.type.name.ToUpper();
             movePPText.text = $"{details.pp}/{details.pp}";
         }));
+    }
+
+    public void OnCloseMovesPanel()
+    {
+        // 1. Troca os painéis
+        movesPanel.SetActive(false);
+        actionsPanel.SetActive(true);
+
+        // 2. (Opcional) Reseta a seleção visual do Menu Principal
+        // Isso garante que a seta volte para o "Fight" ou para onde estava
+        if (actionButtons.Length > 0)
+        {
+            // Se quiser que volte sempre para o Fight (índice 0):
+            SelectAction(actionButtons[0]); 
+        }
+    }
+
+    // DICA EXTRA: Para funcionar com a tecla ESC do teclado
+    void Update()
+    {
+        // Se o painel de ataques estiver aberto e apertar ESC
+        if (movesPanel.activeSelf && Input.GetKeyDown(KeyCode.Escape))
+        {
+            OnCloseMovesPanel();
+        }
     }
 }

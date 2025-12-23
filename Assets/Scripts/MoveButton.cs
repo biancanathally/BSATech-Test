@@ -5,18 +5,18 @@ using TMPro;
 
 public class MoveButton : MonoBehaviour, IPointerEnterHandler
 {
-    [Header("Attack Button Components")]
-    public TMP_Text attackButtonText;
+    [Header("Moves Button Components")]
+    public TMP_Text moveButtonText;
     public Image arrowImage;
     
-    [Header("Attack Data")]
-    private string _attackUrl;
+    [Header("Move Data")]
+    private string _moveUrl;
     private BattleUIManager _battleUIManager;
 
     public void Setup(string name, string url, BattleUIManager mainManager)
     {
-        attackButtonText.text = name.ToUpper();
-        _attackUrl = url;
+        moveButtonText.text = name.ToUpper();
+        _moveUrl = url;
         _battleUIManager = mainManager;
         
         GetComponent<Button>().interactable = true;
@@ -27,9 +27,9 @@ public class MoveButton : MonoBehaviour, IPointerEnterHandler
 
     public void Clear()
     {
-        attackButtonText.text = "-";
+        moveButtonText.text = "-";
         GetComponent<Button>().interactable = false;
-        _attackUrl = "";
+        _moveUrl = "";
 
         if (arrowImage != null)
             arrowImage.gameObject.SetActive(false);
@@ -43,7 +43,7 @@ public class MoveButton : MonoBehaviour, IPointerEnterHandler
 
     public void OnPointerEnter(PointerEventData eventData)
     {
-        if (!string.IsNullOrEmpty(_attackUrl))
-            _battleUIManager.SelectMove(this, _attackUrl);
+        if (!string.IsNullOrEmpty(_moveUrl))
+            _battleUIManager.SelectMove(this, _moveUrl);
     }
 }
