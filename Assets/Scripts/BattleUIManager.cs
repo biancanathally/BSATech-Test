@@ -19,12 +19,14 @@ public class BattleUIManager : MonoBehaviour
     public TMP_Text playerPokemonLevelText;
     public Image playerPokemonGenderImage;
     public TMP_Text playerPokemonHPText;
+    public Image playerHPBar;
 
     [Header("Enemy Data UI")]
     public RawImage enemyPokemonImage;
     public TMP_Text enemyPokemonNameText;
     public TMP_Text enemyPokemonLevelText;
     public Image enemyPokemonGenderImage;
+    public Image enemyHPBar;
 
     [Header("Action Buttons (Main Menu)")]
     public ActionButton[] actionButtons;
@@ -108,11 +110,6 @@ public class BattleUIManager : MonoBehaviour
 
         SetupPokemonData(data, true);
 
-        int baseHp = 0;
-        foreach (var s in data.stats) if (s.stat.name == "hp") baseHp = s.base_stat;
-        int lvl = 50;
-        int hpTotal = Mathf.FloorToInt(2 * baseHp * lvl / 100f) + lvl + 10;
-
         if (dialogueText != null)
             dialogueText.text = $"What will {data.name.ToUpper()} do?";
 
@@ -139,6 +136,7 @@ public class BattleUIManager : MonoBehaviour
         TMP_Text nameTxt = isPlayer ? playerPokemonNameText : enemyPokemonNameText;
         TMP_Text lvlTxt = isPlayer ? playerPokemonLevelText : enemyPokemonLevelText;
         Image genderImg = isPlayer ? playerPokemonGenderImage : enemyPokemonGenderImage;
+        Image hpBar = isPlayer ? playerHPBar : enemyHPBar;
 
         if (nameTxt != null)
             nameTxt.text = data.name.ToUpper();
@@ -152,15 +150,16 @@ public class BattleUIManager : MonoBehaviour
             genderImg.sprite = isMale ? maleIcon : femaleIcon;
         }
 
+        int baseHp = 0;
+        foreach (var s in data.stats) if (s.stat.name == "hp") baseHp = s.base_stat;
+        
+        int maxHp = Mathf.FloorToInt(2 * baseHp * level / 100f) + level + 10;
+
+        if (hpBar != null)
+            hpBar.fillAmount = 1.0f; 
+
         if (isPlayer && playerPokemonHPText != null)
-        {
-            int baseHp = 0;
-            foreach (var s in data.stats) if (s.stat.name == "hp") baseHp = s.base_stat;
-
-            int maxHp = Mathf.FloorToInt(2 * baseHp * level / 100f) + level + 10;
-
             playerPokemonHPText.text = $"{maxHp}/{maxHp}";
-        }
     }
 
     public void SelectMove(MoveButton selectedButton, string url)
