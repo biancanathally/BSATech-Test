@@ -9,28 +9,36 @@ public class BattleUIManager : MonoBehaviour
     public GameObject actionsPanel;
     public GameObject movesPanel;
 
+    [Header("General Assets")]
+    public Sprite maleIcon;
+    public Sprite femaleIcon;
+
+    [Header("Player Data UI")]
+    public RawImage playerPokemonImage;
+    public TMP_Text playerPokemonNameText;
+    public TMP_Text playerPokemonLevelText;
+    public Image playerPokemonGenderImage;
+    public TMP_Text playerPokemonHPText;
+
+    [Header("Enemy Data UI")]
+    public RawImage enemyPokemonImage;
+    public TMP_Text enemyPokemonNameText;
+    public TMP_Text enemyPokemonLevelText;
+    public Image enemyPokemonGenderImage;
+
     [Header("Action Buttons (Main Menu)")]
     public ActionButton[] actionButtons;
-
-    [Header("Pokemon Player")]
-    public RawImage pokemonPlayerImage;
-    // public Text pokemonPlayerNameText;
-    // public Text pokemonPlayerHPText;
-
-    [Header("Pokemon Enemy")]
-    public RawImage pokemonEnemyImage;
-    // public Text pokemonEnemyNameText;
 
     [Header("Moves UI")]
     public MoveButton[] moveButtons;
     public TMP_Text moveTypeText;
     public TMP_Text movePPText;
 
+    [Header("UI Texts")]
+    public TMP_Text dialogueText;
+
     void Start()
     {
-        // moveTypeText.text = "-";
-        // movePPText.text = "-/-";
-
         foreach (var btn in actionButtons)
         {
             btn.Setup(this);
@@ -69,7 +77,9 @@ public class BattleUIManager : MonoBehaviour
         yield return StartCoroutine(PokeApiManager.Instance.GetPokemon(enemyRandomId.ToString(),
             onSuccess: (data) =>
             {
-                StartCoroutine(PokeApiManager.Instance.GetSprite(data.sprites.front_default, tex => pokemonEnemyImage.texture = tex));
+                StartCoroutine(PokeApiManager.Instance.GetSprite(data.sprites.front_default, tex => enemyPokemonImage.texture = tex));
+
+                SetupPokemonData(data, false);
             },
             onError: () => Debug.LogError("Falha ao carregar inimigo")));
 
@@ -94,14 +104,17 @@ public class BattleUIManager : MonoBehaviour
 
     void SetupAllyUI(PokemonData data)
     {
-        // pokemonPlayerNameText.text = data.name.ToUpper();
-        StartCoroutine(PokeApiManager.Instance.GetSprite(data.sprites.back_default, tex => pokemonPlayerImage.texture = tex));
+        StartCoroutine(PokeApiManager.Instance.GetSprite(data.sprites.back_default, tex => playerPokemonImage.texture = tex));
+
+        SetupPokemonData(data, true);
 
         int baseHp = 0;
         foreach (var s in data.stats) if (s.stat.name == "hp") baseHp = s.base_stat;
         int lvl = 50;
-        int hpTotal = Mathf.FloorToInt(((2 * baseHp) * lvl) / 100f) + lvl + 10;
-        // pokemonPlayerHPText.text = $"{hpTotal}/{hpTotal}";
+        int hpTotal = Mathf.FloorToInt(2 * baseHp * lvl / 100f) + lvl + 10;
+
+        if (dialogueText != null)
+            dialogueText.text = $"What will {data.name.ToUpper()} do?";
 
         for (int i = 0; i < moveButtons.Length; i++)
         {
@@ -116,6 +129,37 @@ public class BattleUIManager : MonoBehaviour
             {
                 moveButtons[i].Clear();
             }
+        }
+    }
+
+    void SetupPokemonData(PokemonData data, bool isPlayer)
+    {
+        int level = 50;
+
+        TMP_Text nameTxt = isPlayer ? playerPokemonNameText : enemyPokemonNameText;
+        TMP_Text lvlTxt = isPlayer ? playerPokemonLevelText : enemyPokemonLevelText;
+        Image genderImg = isPlayer ? playerPokemonGenderImage : enemyPokemonGenderImage;
+
+        if (nameTxt != null)
+            nameTxt.text = data.name.ToUpper();
+
+        if (lvlTxt != null)
+            lvlTxt.text = $"Lv{level}";
+
+        if (genderImg != null)
+        {
+            bool isMale = Random.value > 0.5f;
+            genderImg.sprite = isMale ? maleIcon : femaleIcon;
+        }
+
+        if (isPlayer && playerPokemonHPText != null)
+        {
+            int baseHp = 0;
+            foreach (var s in data.stats) if (s.stat.name == "hp") baseHp = s.base_stat;
+
+            int maxHp = Mathf.FloorToInt(2 * baseHp * level / 100f) + level + 10;
+
+            playerPokemonHPText.text = $"{maxHp}/{maxHp}";
         }
     }
 
@@ -145,7 +189,7 @@ public class BattleUIManager : MonoBehaviour
         actionsPanel.SetActive(true);
 
         if (actionButtons.Length > 0)
-            SelectAction(actionButtons[0]); 
+            SelectAction(actionButtons[0]);
     }
 
     // To handle ESC key to close moves panel
