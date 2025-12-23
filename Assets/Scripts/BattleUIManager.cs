@@ -1,5 +1,7 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using TMPro;
 
@@ -42,15 +44,108 @@ public class BattleUIManager : MonoBehaviour
     void Start()
     {
         foreach (var btn in actionButtons)
-        {
             btn.Setup(this);
-        }
 
-        // Fight button is selected by default
         if (actionButtons.Length > 0)
             SelectAction(actionButtons[0]);
 
-        StartCoroutine(StartBattleSequence());
+        if (actionButtons.Length > 1)
+        {
+            actionButtons[1].GetComponent<Button>().onClick.RemoveAllListeners();
+            actionButtons[1].GetComponent<Button>().onClick.AddListener(OnPokemonButton);
+        }
+
+        if (GameSession.IsBattleInProgress)
+            ResumeBattle();
+        else
+            StartCoroutine(StartBattleSequence());
+    }
+
+    IEnumerator StartBattleSequence()
+    {
+        GameSession.IsBattleInProgress = true;
+
+        int enemyId = Random.Range(1, 700);
+        yield return StartCoroutine(PokeApiManager.Instance.GetPokemon(enemyId.ToString(),
+            onSuccess: (data) =>
+            {
+                GameSession.CurrentEnemy = data;
+                SetupEnemyUI(data);
+            },
+            onError: () => Debug.LogError("Erro Inimigo")));
+
+
+        if (GameSession.PlayerParty.Count == 0)
+        {
+            bool playerFound = false;
+            while (!playerFound)
+            {
+                int playerId = Random.Range(1, 700);
+                yield return null;
+                yield return StartCoroutine(PokeApiManager.Instance.GetPokemon(playerId.ToString(),
+                    onSuccess: (data) =>
+                    {
+                        if (!string.IsNullOrEmpty(data.sprites.back_default))
+                        {
+                            GameSession.PlayerParty.Add(data);
+                            SetupAllyUI(data);
+                            playerFound = true;
+
+                            int extraMembersCount = Random.Range(0, 6);
+
+                            for (int i = 0; i < extraMembersCount; i++)
+                            {
+                                StartCoroutine(GenerateRandomPartyMember());
+                            }
+                        }
+                    },
+                    onError: null));
+            }
+        }
+        else
+        {
+            SetupAllyUI(GameSession.PlayerParty[0]);
+        }
+    }
+
+    IEnumerator GenerateRandomPartyMember()
+    {
+        yield return new WaitForSeconds(Random.Range(0.1f, 0.5f));
+
+        int randomId = Random.Range(1, 152);
+        yield return StartCoroutine(PokeApiManager.Instance.GetPokemon(randomId.ToString(),
+            onSuccess: (newData) =>
+            {
+                if (GameSession.PlayerParty.Count < 6)
+                {
+                    GameSession.PlayerParty.Add(newData);
+                }
+            },
+            onError: null));
+    }
+
+    void ResumeBattle()
+    {
+        if (GameSession.CurrentEnemy != null)
+        {
+            SetupEnemyUI(GameSession.CurrentEnemy);
+        }
+
+        if (GameSession.PlayerParty.Count > 0)
+        {
+            SetupAllyUI(GameSession.PlayerParty[0]);
+        }
+    }
+
+    void SetupEnemyUI(PokemonData data)
+    {
+        StartCoroutine(PokeApiManager.Instance.GetSprite(data.sprites.front_default, tex => enemyPokemonImage.texture = tex));
+        SetupPokemonData(data, false);
+    }
+
+    public void OnPokemonButton()
+    {
+        SceneManager.LoadScene("PartyScene");
     }
 
     public void SelectAction(ActionButton selectedButton)
@@ -71,37 +166,6 @@ public class BattleUIManager : MonoBehaviour
     {
         movesPanel.SetActive(false);
         actionsPanel.SetActive(true);
-    }
-
-    IEnumerator StartBattleSequence()
-    {
-        int enemyRandomId = Random.Range(1, 700);
-        yield return StartCoroutine(PokeApiManager.Instance.GetPokemon(enemyRandomId.ToString(),
-            onSuccess: (data) =>
-            {
-                StartCoroutine(PokeApiManager.Instance.GetSprite(data.sprites.front_default, tex => enemyPokemonImage.texture = tex));
-
-                SetupPokemonData(data, false);
-            },
-            onError: () => Debug.LogError("Falha ao carregar inimigo")));
-
-        bool playerPokemonFound = false;
-        while (!playerPokemonFound)
-        {
-            int playerRandomId = Random.Range(1, 700);
-            yield return null;
-
-            yield return StartCoroutine(PokeApiManager.Instance.GetPokemon(playerRandomId.ToString(),
-                onSuccess: (data) =>
-                {
-                    if (!string.IsNullOrEmpty(data.sprites.back_default))
-                    {
-                        SetupAllyUI(data);
-                        playerPokemonFound = true;
-                    }
-                },
-                onError: null));
-        }
     }
 
     void SetupAllyUI(PokemonData data)
@@ -152,11 +216,11 @@ public class BattleUIManager : MonoBehaviour
 
         int baseHp = 0;
         foreach (var s in data.stats) if (s.stat.name == "hp") baseHp = s.base_stat;
-        
+
         int maxHp = Mathf.FloorToInt(2 * baseHp * level / 100f) + level + 10;
 
         if (hpBar != null)
-            hpBar.fillAmount = 1.0f; 
+            hpBar.fillAmount = 1.0f;
 
         if (isPlayer && playerPokemonHPText != null)
             playerPokemonHPText.text = $"{maxHp}/{maxHp}";
