@@ -7,6 +7,11 @@ public class PokemonData
     public Sprites sprites;
     public Stat[] stats;
     public MoveWrapper[] moves;
+    public int savedLevel = 0; 
+    public int savedMaxHp = 0;
+    public int savedCurrentHp = 0;
+    public bool isMale = true;
+    public bool isInitialized = false;
 }
 
 [Serializable]

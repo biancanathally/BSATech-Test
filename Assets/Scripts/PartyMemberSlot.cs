@@ -39,28 +39,26 @@ public class PartyMemberSlot : MonoBehaviour
         }
 
         nameText.text = data.name.ToUpper();
-
-        int level = 50;
-        levelText.text = $"Lv{level}";
+        levelText.text = $"Lv{data.savedLevel}";
 
         if (icon != null && !string.IsNullOrEmpty(data.sprites.front_default))
         {
             StartCoroutine(PokeApiManager.Instance.GetSprite(data.sprites.front_default, tex => icon.texture = tex));
         }
 
-        int baseHp = 0;
-        foreach (var s in data.stats) if (s.stat.name == "hp") baseHp = s.base_stat;
-        int maxHp = Mathf.FloorToInt(2 * baseHp * level / 100f) + level + 10;
-        
         if (hpText != null)
-            hpText.text = $"{maxHp}/{maxHp}";
+        {
+            hpText.text = $"{data.savedCurrentHp}/{data.savedMaxHp}";
+        }
+
         if (hpBar != null)
-            hpBar.fillAmount = 1.0f;
+        {
+            hpBar.fillAmount = (float)data.savedCurrentHp / data.savedMaxHp;
+        }
 
         if (genderImage != null)
         {
-            bool isMale = Random.value > 0.5f;
-            genderImage.sprite = isMale ? maleIcon : femaleIcon;
+            genderImage.sprite = data.isMale ? maleIcon : femaleIcon;
             genderImage.gameObject.SetActive(true);
         }
     }
