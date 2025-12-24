@@ -1,9 +1,9 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using TMPro;
+using Unity.VisualScripting;
 
 public class BattleUIManager : MonoBehaviour
 {
@@ -53,6 +53,17 @@ public class BattleUIManager : MonoBehaviour
         {
             actionButtons[1].GetComponent<Button>().onClick.RemoveAllListeners();
             actionButtons[1].GetComponent<Button>().onClick.AddListener(OnPokemonButton);
+        }
+
+        if (actionButtons.Length > 2)
+        {
+            actionButtons[2].GetComponent<Button>().interactable = false;
+        }
+
+        if (actionButtons.Length > 3)
+        {
+            actionButtons[3].GetComponent<Button>().onClick.RemoveAllListeners();
+            actionButtons[3].GetComponent<Button>().onClick.AddListener(OnRunButton);
         }
 
         if (GameSession.IsBattleInProgress)
@@ -146,9 +157,42 @@ public class BattleUIManager : MonoBehaviour
         SetupPokemonData(data, false);
     }
 
+    public void OnFightButton()
+    {
+        actionsPanel.SetActive(false);
+        movesPanel.SetActive(true);
+    }
+
     public void OnPokemonButton()
     {
         SceneManager.LoadScene("PartyScene");
+    }
+
+    public void OnRunButton()
+    {
+        GameSession.PlayerParty.Clear();
+        GameSession.CurrentEnemy = null;
+        GameSession.IsBattleInProgress = false;
+
+        StopAllCoroutines();
+        PokeApiManager.Instance.StopAllCoroutines();
+
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+    }
+
+    public void OnBackToActions()
+    {
+        movesPanel.SetActive(false);
+        actionsPanel.SetActive(true);
+    }
+
+    public void OnCloseMovesPanel()
+    {
+        movesPanel.SetActive(false);
+        actionsPanel.SetActive(true);
+
+        if (actionButtons.Length > 0)
+            SelectAction(actionButtons[0]);
     }
 
     public void SelectAction(ActionButton selectedButton)
@@ -159,18 +203,6 @@ public class BattleUIManager : MonoBehaviour
         }
     }
 
-    public void OnFightButton()
-    {
-        actionsPanel.SetActive(false);
-        movesPanel.SetActive(true);
-    }
-
-    public void OnBackToActions()
-    {
-        movesPanel.SetActive(false);
-        actionsPanel.SetActive(true);
-    }
-
     void SetupAllyUI(PokemonData data)
     {
         StartCoroutine(PokeApiManager.Instance.GetSprite(data.sprites.back_default, tex => playerPokemonImage.texture = tex));
@@ -178,7 +210,7 @@ public class BattleUIManager : MonoBehaviour
         SetupPokemonData(data, true);
 
         if (dialogueText != null)
-            dialogueText.text = $"What will {data.name.ToUpper()} do?";
+            dialogueText.text = $"What will {data.name.FirstCharacterToUpper()} do?";
 
         for (int i = 0; i < moveButtons.Length; i++)
         {
@@ -201,7 +233,7 @@ public class BattleUIManager : MonoBehaviour
         if (!data.isInitialized)
             InitializePokemonStats(data);
 
-        int level = data.savedLevel; 
+        int level = data.savedLevel;
         int currentHp = data.savedCurrentHp;
         int maxHp = data.savedMaxHp;
 
@@ -215,31 +247,15 @@ public class BattleUIManager : MonoBehaviour
 
         if (lvlTxt != null)
             lvlTxt.text = $"Lv{level}";
-        
+
         if (hpBar != null)
-        {
             hpBar.fillAmount = (float)currentHp / maxHp;
-        }
 
         if (isPlayer && playerPokemonHPText != null)
-        {
             playerPokemonHPText.text = $"{currentHp}/{maxHp}";
-        }
 
         if (genderImg != null)
-        {
-            bool isMale = Random.value > 0.5f;
-            genderImg.sprite = isMale ? maleIcon : femaleIcon;
-        }
-
-        int baseHp = 0;
-        foreach (var s in data.stats) if (s.stat.name == "hp") baseHp = s.base_stat;
-
-        if (hpBar != null)
-            hpBar.fillAmount = 1.0f;
-
-        if (isPlayer && playerPokemonHPText != null)
-            playerPokemonHPText.text = $"{maxHp}/{maxHp}";
+            genderImg.sprite = data.isMale ? maleIcon : femaleIcon;
     }
 
     public void SelectMove(MoveButton selectedButton, string url)
@@ -260,15 +276,6 @@ public class BattleUIManager : MonoBehaviour
             moveTypeText.text = details.type.name.ToUpper();
             movePPText.text = $"{details.pp}/{details.pp}";
         }));
-    }
-
-    public void OnCloseMovesPanel()
-    {
-        movesPanel.SetActive(false);
-        actionsPanel.SetActive(true);
-
-        if (actionButtons.Length > 0)
-            SelectAction(actionButtons[0]);
     }
 
     // To handle ESC key to close moves panel
