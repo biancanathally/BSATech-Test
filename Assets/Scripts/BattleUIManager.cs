@@ -69,6 +69,7 @@ public class BattleUIManager : MonoBehaviour
         yield return StartCoroutine(PokeApiManager.Instance.GetPokemon(enemyId.ToString(),
             onSuccess: (data) =>
             {
+                InitializePokemonStats(data);
                 GameSession.CurrentEnemy = data;
                 SetupEnemyUI(data);
             },
@@ -87,6 +88,7 @@ public class BattleUIManager : MonoBehaviour
                     {
                         if (!string.IsNullOrEmpty(data.sprites.back_default))
                         {
+                            InitializePokemonStats(data);
                             GameSession.PlayerParty.Add(data);
                             SetupAllyUI(data);
                             playerFound = true;
@@ -118,6 +120,7 @@ public class BattleUIManager : MonoBehaviour
             {
                 if (GameSession.PlayerParty.Count < 6)
                 {
+                    InitializePokemonStats(newData);
                     GameSession.PlayerParty.Add(newData);
                 }
             },
@@ -195,7 +198,12 @@ public class BattleUIManager : MonoBehaviour
 
     void SetupPokemonData(PokemonData data, bool isPlayer)
     {
-        int level = 50;
+        if (!data.isInitialized)
+            InitializePokemonStats(data);
+
+        int level = data.savedLevel; 
+        int currentHp = data.savedCurrentHp;
+        int maxHp = data.savedMaxHp;
 
         TMP_Text nameTxt = isPlayer ? playerPokemonNameText : enemyPokemonNameText;
         TMP_Text lvlTxt = isPlayer ? playerPokemonLevelText : enemyPokemonLevelText;
@@ -207,6 +215,16 @@ public class BattleUIManager : MonoBehaviour
 
         if (lvlTxt != null)
             lvlTxt.text = $"Lv{level}";
+        
+        if (hpBar != null)
+        {
+            hpBar.fillAmount = (float)currentHp / maxHp;
+        }
+
+        if (isPlayer && playerPokemonHPText != null)
+        {
+            playerPokemonHPText.text = $"{currentHp}/{maxHp}";
+        }
 
         if (genderImg != null)
         {
@@ -216,8 +234,6 @@ public class BattleUIManager : MonoBehaviour
 
         int baseHp = 0;
         foreach (var s in data.stats) if (s.stat.name == "hp") baseHp = s.base_stat;
-
-        int maxHp = Mathf.FloorToInt(2 * baseHp * level / 100f) + level + 10;
 
         if (hpBar != null)
             hpBar.fillAmount = 1.0f;
@@ -260,5 +276,21 @@ public class BattleUIManager : MonoBehaviour
     {
         if (movesPanel.activeSelf && Input.GetKeyDown(KeyCode.Escape))
             OnCloseMovesPanel();
+    }
+
+    void InitializePokemonStats(PokemonData data)
+    {
+        if (data.isInitialized)
+            return;
+
+        data.savedLevel = Random.Range(40, 100);
+
+        int baseHp = 0;
+        foreach (var s in data.stats) if (s.stat.name == "hp") baseHp = s.base_stat;
+        
+        data.savedMaxHp = Mathf.FloorToInt(2 * baseHp * data.savedLevel / 100f) + data.savedLevel + 10;
+        data.savedCurrentHp = data.savedMaxHp;
+        data.isMale = Random.value > 0.5f;
+        data.isInitialized = true;
     }
 }
