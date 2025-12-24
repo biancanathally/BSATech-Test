@@ -91,7 +91,7 @@ public class BattleUIManager : MonoBehaviour
                             SetupAllyUI(data);
                             playerFound = true;
 
-                            int extraMembersCount = Random.Range(0, 6);
+                            int extraMembersCount = Random.Range(1, 6);
 
                             for (int i = 0; i < extraMembersCount; i++)
                             {
@@ -112,7 +112,7 @@ public class BattleUIManager : MonoBehaviour
     {
         yield return new WaitForSeconds(Random.Range(0.1f, 0.5f));
 
-        int randomId = Random.Range(1, 152);
+        int randomId = Random.Range(1, 700);
         yield return StartCoroutine(PokeApiManager.Instance.GetPokemon(randomId.ToString(),
             onSuccess: (newData) =>
             {

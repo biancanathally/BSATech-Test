@@ -278,6 +278,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: PokemonItemSelection (1)
       objectReference: {fileID: 0}
+    - target: {fileID: 7659526769610764707, guid: 98a7e4965073e44da96d4edebcde69b6, type: 3}
+      propertyPath: m_Transition
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 7659526769610764707, guid: 98a7e4965073e44da96d4edebcde69b6, type: 3}
+      propertyPath: m_SpriteState.m_HighlightedSprite
+      value: 
+      objectReference: {fileID: -2604447295387547537, guid: 6ed405f48fb454919be55142012d446c, type: 3}
     - target: {fileID: 9151972099090818685, guid: 98a7e4965073e44da96d4edebcde69b6, type: 3}
       propertyPath: m_IsActive
       value: 0
@@ -682,6 +690,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: PokemonItemSelection (4)
       objectReference: {fileID: 0}
+    - target: {fileID: 7659526769610764707, guid: 98a7e4965073e44da96d4edebcde69b6, type: 3}
+      propertyPath: m_Transition
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 7659526769610764707, guid: 98a7e4965073e44da96d4edebcde69b6, type: 3}
+      propertyPath: m_SpriteState.m_HighlightedSprite
+      value: 
+      objectReference: {fileID: -2604447295387547537, guid: 6ed405f48fb454919be55142012d446c, type: 3}
     - target: {fileID: 9151972099090818685, guid: 98a7e4965073e44da96d4edebcde69b6, type: 3}
       propertyPath: m_IsActive
       value: 0
@@ -799,6 +815,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: PokemonItemSelection (3)
       objectReference: {fileID: 0}
+    - target: {fileID: 7659526769610764707, guid: 98a7e4965073e44da96d4edebcde69b6, type: 3}
+      propertyPath: m_Transition
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 7659526769610764707, guid: 98a7e4965073e44da96d4edebcde69b6, type: 3}
+      propertyPath: m_SpriteState.m_HighlightedSprite
+      value: 
+      objectReference: {fileID: -2604447295387547537, guid: 6ed405f48fb454919be55142012d446c, type: 3}
     - target: {fileID: 9151972099090818685, guid: 98a7e4965073e44da96d4edebcde69b6, type: 3}
       propertyPath: m_IsActive
       value: 0
@@ -1564,6 +1588,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: PokemonItemSelection (5)
       objectReference: {fileID: 0}
+    - target: {fileID: 7659526769610764707, guid: 98a7e4965073e44da96d4edebcde69b6, type: 3}
+      propertyPath: m_Transition
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 7659526769610764707, guid: 98a7e4965073e44da96d4edebcde69b6, type: 3}
+      propertyPath: m_SpriteState.m_HighlightedSprite
+      value: 
+      objectReference: {fileID: -2604447295387547537, guid: 6ed405f48fb454919be55142012d446c, type: 3}
     - target: {fileID: 9151972099090818685, guid: 98a7e4965073e44da96d4edebcde69b6, type: 3}
       propertyPath: m_IsActive
       value: 0
@@ -1681,6 +1713,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: PokemonItemSelection (2)
       objectReference: {fileID: 0}
+    - target: {fileID: 7659526769610764707, guid: 98a7e4965073e44da96d4edebcde69b6, type: 3}
+      propertyPath: m_Transition
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 7659526769610764707, guid: 98a7e4965073e44da96d4edebcde69b6, type: 3}
+      propertyPath: m_SpriteState.m_HighlightedSprite
+      value: 
+      objectReference: {fileID: -2604447295387547537, guid: 6ed405f48fb454919be55142012d446c, type: 3}
     - target: {fileID: 9151972099090818685, guid: 98a7e4965073e44da96d4edebcde69b6, type: 3}
       propertyPath: m_IsActive
       value: 0
@@ -1715,12 +1755,16 @@ PrefabInstance:
     m_TransformParent: {fileID: 918181382}
     m_Modifications:
     - target: {fileID: 1777390661954963174, guid: 98a7e4965073e44da96d4edebcde69b6, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 125.11
+      objectReference: {fileID: 0}
+    - target: {fileID: 1777390661954963174, guid: 98a7e4965073e44da96d4edebcde69b6, type: 3}
       propertyPath: m_SizeDelta.y
       value: 22.5146
       objectReference: {fileID: 0}
     - target: {fileID: 1777390661954963174, guid: 98a7e4965073e44da96d4edebcde69b6, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: -12.8
+      value: 24.76
       objectReference: {fileID: 0}
     - target: {fileID: 1777390661954963174, guid: 98a7e4965073e44da96d4edebcde69b6, type: 3}
       propertyPath: m_AnchoredPosition.y
@@ -1858,6 +1902,14 @@ PrefabInstance:
       propertyPath: m_Sprite
       value: 
       objectReference: {fileID: -2463274700679431471, guid: 035d92967f65440138354818b95d22f9, type: 3}
+    - target: {fileID: 7659526769610764707, guid: 98a7e4965073e44da96d4edebcde69b6, type: 3}
+      propertyPath: m_Transition
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 7659526769610764707, guid: 98a7e4965073e44da96d4edebcde69b6, type: 3}
+      propertyPath: m_SpriteState.m_HighlightedSprite
+      value: 
+      objectReference: {fileID: 5708384835273863058, guid: 6903be82047314f39894e85ae0b8d5a7, type: 3}
     - target: {fileID: 9012696344578713975, guid: 98a7e4965073e44da96d4edebcde69b6, type: 3}
       propertyPath: m_IsActive
       value: 1

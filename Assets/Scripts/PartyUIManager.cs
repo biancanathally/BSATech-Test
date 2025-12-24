@@ -13,7 +13,7 @@ public class PartyUIManager : MonoBehaviour
     void Start()
     {
         SetupParty();
-        if(promptText != null) promptText.text = "Choose a POKEMON";
+        if (promptText != null) promptText.text = "Choose a POKEMON";
     }
 
     void SetupParty()
@@ -24,8 +24,22 @@ public class PartyUIManager : MonoBehaviour
         for (int i = 0; i < GameSession.PlayerParty.Count; i++)
         {
             if (i < partySlots.Length)
-                partySlots[i].Setup(GameSession.PlayerParty[i]);
+                partySlots[i].Setup(GameSession.PlayerParty[i], i, this);
         }
+    }
+
+    public void OnPokemonSelected(int indexSelected)
+    {
+        if (indexSelected > 0 && indexSelected < GameSession.PlayerParty.Count)
+        {
+            PokemonData previousLeader = GameSession.PlayerParty[0];
+            PokemonData newLeader = GameSession.PlayerParty[indexSelected];
+
+            GameSession.PlayerParty[0] = newLeader;
+            GameSession.PlayerParty[indexSelected] = previousLeader;
+        }
+
+        SceneManager.LoadScene("BattleScene");
     }
 
     public void OnCancelButton()

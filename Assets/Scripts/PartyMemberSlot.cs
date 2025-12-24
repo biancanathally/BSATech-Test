@@ -16,9 +16,27 @@ public class PartyMemberSlot : MonoBehaviour
     public Sprite maleIcon;
     public Sprite femaleIcon;
 
-    public void Setup(PokemonData data)
+    private int myIndex;
+    private PartyUIManager _partyUIManager;
+    private Button myButton;
+
+    private void Awake()
+    {
+        myButton = GetComponent<Button>();
+    }
+
+    public void Setup(PokemonData data, int index, PartyUIManager uiManager)
     {
         gameObject.SetActive(true);
+
+        myIndex = index;
+        _partyUIManager = uiManager;
+
+        if (myButton != null)
+        {
+            myButton.onClick.RemoveAllListeners();
+            myButton.onClick.AddListener(OnSlotClicked);
+        }
 
         nameText.text = data.name.ToUpper();
 
@@ -45,6 +63,12 @@ public class PartyMemberSlot : MonoBehaviour
             genderImage.sprite = isMale ? maleIcon : femaleIcon;
             genderImage.gameObject.SetActive(true);
         }
+    }
+
+    void OnSlotClicked()
+    {
+        if (_partyUIManager != null)
+            _partyUIManager.OnPokemonSelected(myIndex);
     }
 
     public void Clear()
