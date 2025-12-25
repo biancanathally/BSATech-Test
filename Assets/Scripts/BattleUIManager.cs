@@ -66,58 +66,21 @@ public class BattleUIManager : MonoBehaviour
             actionButtons[3].GetComponent<Button>().onClick.AddListener(OnRunButton);
         }
 
-        if (GameSession.IsBattleInProgress)
-            ResumeBattle();
-        else
-            StartCoroutine(StartBattleSequence());
+        ResumeBattle();
+        StartCoroutine(FillPartyInBackground());
     }
 
-    IEnumerator StartBattleSequence()
+    IEnumerator FillPartyInBackground()
     {
-        GameSession.IsBattleInProgress = true;
-
-        int enemyId = Random.Range(1, 700);
-        yield return StartCoroutine(PokeApiManager.Instance.GetPokemon(enemyId.ToString(),
-            onSuccess: (data) =>
-            {
-                InitializePokemonStats(data);
-                GameSession.CurrentEnemy = data;
-                SetupEnemyUI(data);
-            },
-            onError: () => Debug.LogError("Erro Inimigo")));
-
-
-        if (GameSession.PlayerParty.Count == 0)
+        if (GameSession.PlayerParty.Count == 1)
         {
-            bool playerFound = false;
-            while (!playerFound)
+            int extraMembersCount = Random.Range(1, 6);
+
+            for (int i = 0; i < extraMembersCount; i++)
             {
-                int playerId = Random.Range(1, 700);
-                yield return null;
-                yield return StartCoroutine(PokeApiManager.Instance.GetPokemon(playerId.ToString(),
-                    onSuccess: (data) =>
-                    {
-                        if (!string.IsNullOrEmpty(data.sprites.back_default))
-                        {
-                            InitializePokemonStats(data);
-                            GameSession.PlayerParty.Add(data);
-                            SetupAllyUI(data);
-                            playerFound = true;
-
-                            int extraMembersCount = Random.Range(1, 6);
-
-                            for (int i = 0; i < extraMembersCount; i++)
-                            {
-                                StartCoroutine(GenerateRandomPartyMember());
-                            }
-                        }
-                    },
-                    onError: null));
+                PokeApiManager.Instance.StartCoroutine(GenerateRandomPartyMember());
+                yield return new WaitForSeconds(0.2f);
             }
-        }
-        else
-        {
-            SetupAllyUI(GameSession.PlayerParty[0]);
         }
     }
 
@@ -151,12 +114,6 @@ public class BattleUIManager : MonoBehaviour
         }
     }
 
-    void SetupEnemyUI(PokemonData data)
-    {
-        StartCoroutine(PokeApiManager.Instance.GetSprite(data.sprites.front_default, tex => enemyPokemonImage.texture = tex));
-        SetupPokemonData(data, false);
-    }
-
     public void OnFightButton()
     {
         actionsPanel.SetActive(false);
@@ -170,14 +127,9 @@ public class BattleUIManager : MonoBehaviour
 
     public void OnRunButton()
     {
-        GameSession.PlayerParty.Clear();
-        GameSession.CurrentEnemy = null;
-        GameSession.IsBattleInProgress = false;
-
         StopAllCoroutines();
         PokeApiManager.Instance.StopAllCoroutines();
-
-        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+        SceneManager.LoadScene("LoadingScene");
     }
 
     public void OnBackToActions()
@@ -203,9 +155,38 @@ public class BattleUIManager : MonoBehaviour
         }
     }
 
+    void SetupEnemyUI(PokemonData data)
+    {
+        if (data.frontTexture != null)
+        {
+            enemyPokemonImage.texture = data.frontTexture;
+        }
+        else
+        {
+            StartCoroutine(PokeApiManager.Instance.GetSprite(data.sprites.front_default, tex =>
+            {
+                enemyPokemonImage.texture = tex;
+                data.frontTexture = tex;
+            }));
+        }
+
+        SetupPokemonData(data, false);
+    }
+
     void SetupAllyUI(PokemonData data)
     {
-        StartCoroutine(PokeApiManager.Instance.GetSprite(data.sprites.back_default, tex => playerPokemonImage.texture = tex));
+        if (data.backTexture != null)
+        {
+            playerPokemonImage.texture = data.backTexture;
+        }
+        else
+        {
+            StartCoroutine(PokeApiManager.Instance.GetSprite(data.sprites.back_default, tex =>
+            {
+                playerPokemonImage.texture = tex;
+                data.backTexture = tex;
+            }));
+        }
 
         SetupPokemonData(data, true);
 
