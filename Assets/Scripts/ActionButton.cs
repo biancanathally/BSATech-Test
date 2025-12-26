@@ -1,5 +1,5 @@
 using UnityEngine;
-using UnityEngine.EventSystems; // Para detectar o mouse
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 public class ActionButton : MonoBehaviour, IPointerEnterHandler

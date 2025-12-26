@@ -1226,6 +1226,7 @@ GameObject:
   - component: {fileID: 996982082}
   - component: {fileID: 996982081}
   - component: {fileID: 996982080}
+  - component: {fileID: 996982083}
   m_Layer: 5
   m_Name: Cancel
   m_TagString: Untagged
@@ -1348,6 +1349,22 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 996982078}
   m_CullTransparentMesh: 1
+--- !u!114 &996982083
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 996982078}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d625646b345954063a152ddd9da73915, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  targetImage: {fileID: 665417033}
+  normalSprite: {fileID: -4412288607071258336, guid: bfcb56b97ba76485c929680396fc62db, type: 3}
+  hoverSprite: {fileID: -5925553701154211566, guid: 223f9b844c63a4a799328d7532ca9bf7, type: 3}
+  preserveAspect: 1
 --- !u!1 &1211432370
 GameObject:
   m_ObjectHideFlags: 0
