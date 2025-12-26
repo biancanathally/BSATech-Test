@@ -217,6 +217,18 @@ public class BattleUIManager : MonoBehaviour
             {
                 moveButtons[i].Setup(data.moves[i].move.name, data.moves[i].move.url, this);
 
+                Button btn = moveButtons[i].GetComponent<Button>();
+                
+                if (btn != null)
+                {
+                    btn.onClick.RemoveAllListeners(); 
+
+                    btn.onClick.AddListener(() => 
+                    {
+                        Debug.Log("Funcionalidade ainda não foi implementada");
+                    });
+                }
+
                 if (i == 0)
                     SelectMove(moveButtons[i], data.moves[i].move.url);
             }
