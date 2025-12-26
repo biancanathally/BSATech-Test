@@ -85,6 +85,7 @@ public class PartyUIManager : MonoBehaviour
 
     private void OnSummaryAction()
     {
+        GameSession.PokemonIndexToView = _pendingSlotIndex;
         SceneManager.LoadScene("SummaryScene");
     }
 

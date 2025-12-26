@@ -70,4 +70,37 @@ public class PokeApiManager : MonoBehaviour
             }
         }
     }
+
+    public IEnumerator GetAbilityDescription(string url, System.Action<string> onSuccess)
+    {
+        using (UnityWebRequest req = UnityWebRequest.Get(url))
+        {
+            yield return req.SendWebRequest();
+
+            if (req.result == UnityWebRequest.Result.Success)
+            {
+                AbilityDetailData data = JsonUtility.FromJson<AbilityDetailData>(req.downloadHandler.text);
+                string desc = "No description.";
+
+                if (data.flavor_text_entries != null)
+                {
+                    foreach (var entry in data.flavor_text_entries)
+                    {
+                        if (entry.language.name == "en")
+                        {
+                            // Limpa quebras de linha estranhas da API
+                            desc = entry.flavor_text.Replace("\n", " ").Replace("\f", " ");
+                            break;
+                        }
+                    }
+                }
+                onSuccess?.Invoke(desc);
+            }
+            else
+            {
+                Debug.LogWarning("Erro ability: " + req.error);
+                onSuccess?.Invoke("Could not load description.");
+            }
+        }
+    }
 }

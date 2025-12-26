@@ -4,5 +4,6 @@ public static class GameSession
 {
     public static List<PokemonData> PlayerParty = new List<PokemonData>();
     public static PokemonData CurrentEnemy;
-    public static bool IsBattleInProgress = false;
+    public static bool IsBattleInProgress = false; 
+    public static int PokemonIndexToView = -1;
 }
