@@ -17,6 +17,9 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/PartyScene.unity
     guid: 8a6eb278e16354cbeb3bb146836dda26
+  - enabled: 1
+    path: Assets/Scenes/SummaryScene.unity
+    guid: a70ffd58c70294ab58e22e608d600564
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
   m_UseUCBPForAssetBundles: 0

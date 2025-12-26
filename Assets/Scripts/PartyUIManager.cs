@@ -1,6 +1,7 @@
 using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 using TMPro;
 
 public class PartyUIManager : MonoBehaviour
@@ -9,15 +10,44 @@ public class PartyUIManager : MonoBehaviour
     public PartyMemberSlot[] partySlots;
     public TMP_Text promptText;
 
+    [Header("Dialogue Background Objects")]
+    public GameObject defaultBackgroundObject;
+    public GameObject popupBackgroundObject;
+
+    [Header("Context Menu (Pop-up)")]
+    public GameObject contextMenuPanel;
+    public Button summaryButton;
+    public Button switchButton;
+    public Button cancelButton;
+
     [Header("Transition")]
     public RectTransform transitionPanel;
     public float transitionSpeed = 2.0f;
 
+    private int _pendingSlotIndex = -1;
+
     void Start()
     {
         SetupParty();
-        if (promptText != null)
-            promptText.text = "Choose a POKEMON";
+
+        UpdatePromptText("Choose a POKEMON");
+
+        if (defaultBackgroundObject != null)
+            defaultBackgroundObject.SetActive(true);
+        if (popupBackgroundObject != null)
+            popupBackgroundObject.SetActive(false);
+
+        if (contextMenuPanel != null)
+            contextMenuPanel.SetActive(false);
+
+        if (summaryButton != null)
+            summaryButton.onClick.AddListener(OnSummaryAction);
+
+        if (switchButton != null)
+            switchButton.onClick.AddListener(OnSwitchAction);
+
+        if (cancelButton != null)
+            cancelButton.onClick.AddListener(OnCancelMenuAction);
 
         if (transitionPanel != null)
         {
@@ -40,12 +70,63 @@ public class PartyUIManager : MonoBehaviour
 
     public void OnPokemonSelected(int indexSelected)
     {
-        StartCoroutine(TransitionAndSwap(indexSelected));
+        _pendingSlotIndex = indexSelected;
+
+        if (contextMenuPanel != null)
+            contextMenuPanel.SetActive(true);
+
+        if (defaultBackgroundObject != null)
+            defaultBackgroundObject.SetActive(false);
+        if (popupBackgroundObject != null)
+            popupBackgroundObject.SetActive(true);
+
+        UpdatePromptText("Do what with this PKMN?");
+    }
+
+    private void OnSummaryAction()
+    {
+        GameSession.PokemonIndexToView = _pendingSlotIndex;
+        SceneManager.LoadScene("SummaryScene");
+    }
+
+    private void OnSwitchAction()
+    {
+        int indexToSwap = _pendingSlotIndex;
+
+        OnCancelMenuAction();
+        StartCoroutine(TransitionAndSwap(indexToSwap));
+    }
+
+    private void OnCancelMenuAction()
+    {
+        if (contextMenuPanel != null)
+            contextMenuPanel.SetActive(false);
+        
+        if (defaultBackgroundObject != null)
+            defaultBackgroundObject.SetActive(true);
+        if (popupBackgroundObject != null)
+            popupBackgroundObject.SetActive(false);
+
+        UpdatePromptText("Choose a POKEMON");
+
+        _pendingSlotIndex = -1;
     }
 
     public void OnCancelButton()
     {
+        if (contextMenuPanel != null && contextMenuPanel.activeSelf)
+        {
+            OnCancelMenuAction();
+            return;
+        }
+
         StartCoroutine(TransitionAndExit());
+    }
+
+    private void UpdatePromptText(string text)
+    {
+        if (promptText != null)
+            promptText.text = text;
     }
 
     private IEnumerator SlideInSequence()
