@@ -293,7 +293,6 @@ public class BattleUIManager : MonoBehaviour
 
         data.savedMaxHp = Mathf.FloorToInt(2 * baseHp * data.savedLevel / 100f) + data.savedLevel + 10;
         data.savedCurrentHp = data.savedMaxHp;
-        // okie dokie lendario e mitico
         data.isMale = Random.value > 0.5f;
         data.isInitialized = true;
     }

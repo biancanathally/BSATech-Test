@@ -100,18 +100,11 @@ public class SummaryUIManager : MonoBehaviour
             }
         }
 
-        // if (_currentData.abilities != null && _currentData.abilities.Length > 0 && abilityNameText != null)
-        // {
-        //     abilityNameText.text = _currentData.abilities[0].ability.name.ToUpper();
-        // }
-
         if (_currentData.abilities != null && _currentData.abilities.Length > 0)
         {
-            // 1. Define o Nome
             if (abilityNameText != null)
                 abilityNameText.text = _currentData.abilities[0].ability.name.ToUpper();
 
-            // 2. Busca a Descrição (NOVO)
             if (abilityDescText != null)
             {
                 abilityDescText.text = "Loading...";

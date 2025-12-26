@@ -16,8 +16,8 @@ public class PokeApiManager : MonoBehaviour
 
                 if (_instance == null)
                 {
-                    GameObject obj = new GameObject("PokeApiService_Auto"); // Cria objeto vazio
-                    _instance = obj.AddComponent<PokeApiManager>(); // Adiciona este script nele
+                    GameObject obj = new GameObject("PokeApiService_Auto");
+                    _instance = obj.AddComponent<PokeApiManager>();
                 }
             }
             return _instance;
@@ -88,7 +88,6 @@ public class PokeApiManager : MonoBehaviour
                     {
                         if (entry.language.name == "en")
                         {
-                            // Limpa quebras de linha estranhas da API
                             desc = entry.flavor_text.Replace("\n", " ").Replace("\f", " ");
                             break;
                         }
