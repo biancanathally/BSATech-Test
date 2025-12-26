@@ -16,9 +16,6 @@ public class LoadingManager : MonoBehaviour
         GameSession.CurrentEnemy = null;
         GameSession.IsBattleInProgress = false;
 
-        // if (loadingText != null)
-        //     loadingText.text = "Searching for wild Pokemon...";
-
         UpdateProgressBar(0f, "Initializing...");
 
         StartCoroutine(LoadInitialData());
@@ -71,8 +68,6 @@ public class LoadingManager : MonoBehaviour
         GameSession.CurrentEnemy = tempEnemy;
 
         UpdateProgressBar(0.5f, "Preparing your Pokemon...");
-        // if (loadingText != null)
-        //     loadingText.text = "Choosing your starter...";
 
         bool playerReady = false;
 
@@ -94,7 +89,7 @@ public class LoadingManager : MonoBehaviour
             if (playerJsonLoaded && !string.IsNullOrEmpty(tempPlayer.sprites.back_default))
             {
                 UpdateProgressBar(0.75f, "Loading your Pokemon...");
-                
+
                 yield return StartCoroutine(PokeApiManager.Instance.GetSprite(tempPlayer.sprites.back_default,
                     (tex) =>
                     {
@@ -112,12 +107,8 @@ public class LoadingManager : MonoBehaviour
             yield return null;
         }
 
-        // if (loadingText != null)
-        //     loadingText.text = "Battle Starting!";
-
         UpdateProgressBar(1f, "Battle Starting!");
 
-        // yield return new WaitForSeconds(0.2f);
         yield return new WaitForSeconds(1.5f);
 
         GameSession.IsBattleInProgress = true;
