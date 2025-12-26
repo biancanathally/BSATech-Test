@@ -1,4 +1,4 @@
-# 🎮 Pokémon Unity Battle System
+# 🎮 Pokémon battle system
 
 Este projeto foi desenvolvido como um teste técnico com o objetivo de **reproduzir a cena de batalha do Pokémon Emerald**, integrando dados reais consumidos da **[PokeAPI](https://pokeapi.co/)**.
 
