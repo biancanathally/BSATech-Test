@@ -41,7 +41,11 @@ public class BattleUIManager : MonoBehaviour
     [Header("UI Texts")]
     public TMP_Text dialogueText;
 
-    void Start()
+    [Header("Transition")]
+    public RectTransform transitionPanel;
+    public float transitionSpeed = 2.0f;
+
+    private void Start()
     {
         foreach (var btn in actionButtons)
             btn.Setup(this);
@@ -66,62 +70,39 @@ public class BattleUIManager : MonoBehaviour
             actionButtons[3].GetComponent<Button>().onClick.AddListener(OnRunButton);
         }
 
-        if (GameSession.IsBattleInProgress)
-            ResumeBattle();
+        if (transitionPanel != null)
+        {
+            transitionPanel.anchoredPosition = Vector2.zero;
+            StartCoroutine(SlideInSequence());
+        }
         else
-            StartCoroutine(StartBattleSequence());
+        {
+            ResumeBattle();
+            StartCoroutine(FillPartyInBackground());
+        }
     }
 
-    IEnumerator StartBattleSequence()
+    private void Update()
     {
-        GameSession.IsBattleInProgress = true;
+        if (movesPanel.activeSelf && Input.GetKeyDown(KeyCode.Escape))
+            OnCloseMovesPanel();
+    }
 
-        int enemyId = Random.Range(1, 700);
-        yield return StartCoroutine(PokeApiManager.Instance.GetPokemon(enemyId.ToString(),
-            onSuccess: (data) =>
-            {
-                InitializePokemonStats(data);
-                GameSession.CurrentEnemy = data;
-                SetupEnemyUI(data);
-            },
-            onError: () => Debug.LogError("Erro Inimigo")));
-
-
-        if (GameSession.PlayerParty.Count == 0)
+    public IEnumerator FillPartyInBackground()
+    {
+        if (GameSession.PlayerParty.Count == 1)
         {
-            bool playerFound = false;
-            while (!playerFound)
+            int extraMembersCount = Random.Range(1, 6);
+
+            for (int i = 0; i < extraMembersCount; i++)
             {
-                int playerId = Random.Range(1, 700);
-                yield return null;
-                yield return StartCoroutine(PokeApiManager.Instance.GetPokemon(playerId.ToString(),
-                    onSuccess: (data) =>
-                    {
-                        if (!string.IsNullOrEmpty(data.sprites.back_default))
-                        {
-                            InitializePokemonStats(data);
-                            GameSession.PlayerParty.Add(data);
-                            SetupAllyUI(data);
-                            playerFound = true;
-
-                            int extraMembersCount = Random.Range(1, 6);
-
-                            for (int i = 0; i < extraMembersCount; i++)
-                            {
-                                StartCoroutine(GenerateRandomPartyMember());
-                            }
-                        }
-                    },
-                    onError: null));
+                PokeApiManager.Instance.StartCoroutine(GenerateRandomPartyMember());
+                yield return new WaitForSeconds(0.2f);
             }
         }
-        else
-        {
-            SetupAllyUI(GameSession.PlayerParty[0]);
-        }
     }
 
-    IEnumerator GenerateRandomPartyMember()
+    private IEnumerator GenerateRandomPartyMember()
     {
         yield return new WaitForSeconds(Random.Range(0.1f, 0.5f));
 
@@ -138,7 +119,7 @@ public class BattleUIManager : MonoBehaviour
             onError: null));
     }
 
-    void ResumeBattle()
+    private void ResumeBattle()
     {
         if (GameSession.CurrentEnemy != null)
         {
@@ -151,12 +132,6 @@ public class BattleUIManager : MonoBehaviour
         }
     }
 
-    void SetupEnemyUI(PokemonData data)
-    {
-        StartCoroutine(PokeApiManager.Instance.GetSprite(data.sprites.front_default, tex => enemyPokemonImage.texture = tex));
-        SetupPokemonData(data, false);
-    }
-
     public void OnFightButton()
     {
         actionsPanel.SetActive(false);
@@ -165,19 +140,14 @@ public class BattleUIManager : MonoBehaviour
 
     public void OnPokemonButton()
     {
-        SceneManager.LoadScene("PartyScene");
+        StartCoroutine(SlideOutAndLoad("PartyScene"));
     }
 
     public void OnRunButton()
     {
-        GameSession.PlayerParty.Clear();
-        GameSession.CurrentEnemy = null;
-        GameSession.IsBattleInProgress = false;
-
         StopAllCoroutines();
         PokeApiManager.Instance.StopAllCoroutines();
-
-        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+        StartCoroutine(SlideOutAndLoad("LoadingScene"));
     }
 
     public void OnBackToActions()
@@ -203,9 +173,38 @@ public class BattleUIManager : MonoBehaviour
         }
     }
 
-    void SetupAllyUI(PokemonData data)
+    private void SetupEnemyUI(PokemonData data)
     {
-        StartCoroutine(PokeApiManager.Instance.GetSprite(data.sprites.back_default, tex => playerPokemonImage.texture = tex));
+        if (data.frontTexture != null)
+        {
+            enemyPokemonImage.texture = data.frontTexture;
+        }
+        else
+        {
+            StartCoroutine(PokeApiManager.Instance.GetSprite(data.sprites.front_default, tex =>
+            {
+                enemyPokemonImage.texture = tex;
+                data.frontTexture = tex;
+            }));
+        }
+
+        SetupPokemonData(data, false);
+    }
+
+    private void SetupAllyUI(PokemonData data)
+    {
+        if (data.backTexture != null)
+        {
+            playerPokemonImage.texture = data.backTexture;
+        }
+        else
+        {
+            StartCoroutine(PokeApiManager.Instance.GetSprite(data.sprites.back_default, tex =>
+            {
+                playerPokemonImage.texture = tex;
+                data.backTexture = tex;
+            }));
+        }
 
         SetupPokemonData(data, true);
 
@@ -228,7 +227,7 @@ public class BattleUIManager : MonoBehaviour
         }
     }
 
-    void SetupPokemonData(PokemonData data, bool isPlayer)
+    private void SetupPokemonData(PokemonData data, bool isPlayer)
     {
         if (!data.isInitialized)
             InitializePokemonStats(data);
@@ -278,14 +277,7 @@ public class BattleUIManager : MonoBehaviour
         }));
     }
 
-    // To handle ESC key to close moves panel
-    void Update()
-    {
-        if (movesPanel.activeSelf && Input.GetKeyDown(KeyCode.Escape))
-            OnCloseMovesPanel();
-    }
-
-    void InitializePokemonStats(PokemonData data)
+    private void InitializePokemonStats(PokemonData data)
     {
         if (data.isInitialized)
             return;
@@ -293,11 +285,56 @@ public class BattleUIManager : MonoBehaviour
         data.savedLevel = Random.Range(40, 100);
 
         int baseHp = 0;
-        foreach (var s in data.stats) if (s.stat.name == "hp") baseHp = s.base_stat;
-        
+        foreach (var s in data.stats)
+        {
+            if (s.stat.name == "hp")
+                baseHp = s.base_stat;
+        }
+
         data.savedMaxHp = Mathf.FloorToInt(2 * baseHp * data.savedLevel / 100f) + data.savedLevel + 10;
         data.savedCurrentHp = data.savedMaxHp;
+        // okie dokie lendario e mitico
         data.isMale = Random.value > 0.5f;
         data.isInitialized = true;
+    }
+
+    private IEnumerator SlideInSequence()
+    {
+        ResumeBattle();
+        StartCoroutine(FillPartyInBackground());
+
+        yield return new WaitForSeconds(0.1f);
+
+        float screenWidth = transitionPanel.rect.width;
+        Vector2 startPos = Vector2.zero;
+        Vector2 endPos = new Vector2(screenWidth, 0);
+
+        float t = 0f;
+        while (t < 1f)
+        {
+            t += Time.deltaTime * transitionSpeed;
+            transitionPanel.anchoredPosition = Vector2.Lerp(startPos, endPos, t);
+            yield return null;
+        }
+    }
+
+    public IEnumerator SlideOutAndLoad(string sceneName)
+    {
+        float screenWidth = transitionPanel.rect.width;
+
+        Vector2 startPos = new Vector2(-screenWidth, 0);
+        transitionPanel.anchoredPosition = startPos;
+
+        Vector2 endPos = Vector2.zero;
+
+        float t = 0f;
+        while (t < 1f)
+        {
+            t += Time.deltaTime * transitionSpeed;
+            transitionPanel.anchoredPosition = Vector2.Lerp(startPos, endPos, t);
+            yield return null;
+        }
+
+        SceneManager.LoadScene(sceneName);
     }
 }

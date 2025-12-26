@@ -5,7 +5,7 @@ using TMPro;
 public class PartyMemberSlot : MonoBehaviour
 {
     [Header("UI Components")]
-    public RawImage icon;
+    public RawImage pokemonIcon;
     public TMP_Text nameText;
     public TMP_Text levelText;
     public Image hpBar;
@@ -41,9 +41,9 @@ public class PartyMemberSlot : MonoBehaviour
         nameText.text = data.name.ToUpper();
         levelText.text = $"Lv{data.savedLevel}";
 
-        if (icon != null && !string.IsNullOrEmpty(data.sprites.front_default))
+        if (pokemonIcon != null && !string.IsNullOrEmpty(data.sprites.front_default))
         {
-            StartCoroutine(PokeApiManager.Instance.GetSprite(data.sprites.front_default, tex => icon.texture = tex));
+            StartCoroutine(PokeApiManager.Instance.GetSprite(data.sprites.front_default, tex => pokemonIcon.texture = tex));
         }
 
         if (hpText != null)
@@ -63,7 +63,7 @@ public class PartyMemberSlot : MonoBehaviour
         }
     }
 
-    void OnSlotClicked()
+    private void OnSlotClicked()
     {
         if (_partyUIManager != null)
             _partyUIManager.OnPokemonSelected(myIndex);

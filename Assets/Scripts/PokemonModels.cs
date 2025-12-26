@@ -1,4 +1,5 @@
 using System;
+using UnityEngine;
 
 [Serializable]
 public class PokemonData
@@ -7,6 +8,8 @@ public class PokemonData
     public Sprites sprites;
     public Stat[] stats;
     public MoveWrapper[] moves;
+    public Texture2D frontTexture;
+    public Texture2D backTexture;
     public int savedLevel = 0; 
     public int savedMaxHp = 0;
     public int savedCurrentHp = 0;
@@ -45,4 +48,6 @@ public class MoveDetailsData
 }
 
 [Serializable]
-public class MoveType { public string name; }
+public class MoveType {
+    public string name;
+}
