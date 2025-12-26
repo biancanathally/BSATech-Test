@@ -2,20 +2,19 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 
-// Este script pode ser colocado em QUALQUER botão do jogo
 public class PokeballHoverEffect : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, ISelectHandler, IDeselectHandler
 {
     [Header("Visuals")]
-    public Image targetImage;       // A imagem que vai mudar (ex: a pokébola)
-    public Sprite normalSprite;     // Sprite cinza
-    public Sprite hoverSprite;      // Sprite colorida
+    public Image targetImage;
+    public Sprite normalSprite;
+    public Sprite hoverSprite;
     
     [Header("Settings")]
-    public bool preserveAspect = true; // Se deve manter a proporção
+    public bool preserveAspect = true;
 
     private void OnEnable()
     {
-        UpdateVisual(false); // Reseta ao ativar
+        UpdateVisual(false);
     }
 
     public void OnPointerEnter(PointerEventData eventData) => UpdateVisual(true);
