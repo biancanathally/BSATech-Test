@@ -48,4 +48,6 @@ public class MoveDetailsData
 }
 
 [Serializable]
-public class MoveType { public string name; }
+public class MoveType {
+    public string name;
+}
